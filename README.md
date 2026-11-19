@@ -5,7 +5,7 @@ Kanban de acompanhamento do projeto StartU + Insight com a Pantynova: tarefas, a
 ## Estrutura
 
 * `index.html`: o quadro (HTML, CSS e JS em um arquivo, sem build).
-* `cards.js`: a base de cards que o quadro carrega.
+* `cards.js`: a base de cards que o quadro carrega. Desde 19/11, uma tarefa por frente com subtarefas no campo `subtasks` ({t, dono, prazo, nota, ok}).
 * `.nojekyll`: faz o GitHub Pages servir os arquivos como estão.
 
 ## Como atualizar a base

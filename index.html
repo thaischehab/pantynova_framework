@@ -92,6 +92,21 @@ label textarea{min-height:76px;resize:vertical}
 .actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;align-items:center}
 .actions .r{display:flex;gap:8px;margin-left:auto}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:30}
+.prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;list-style:none;font-weight:600}
+.prog::-webkit-details-marker{display:none}
+.prog .pb{flex:1;height:5px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.prog .pb i{display:block;height:100%;background:var(--done)}
+.prog .chev{transition:transform .15s}
+details[open] > .prog .chev{transform:rotate(180deg)}
+.subs{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.subs li{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;line-height:1.35}
+.subs li input{margin:2px 0 0;accent-color:var(--done);flex:none;width:14px;height:14px}
+.subs li.ok .st{color:var(--muted);text-decoration:line-through}
+.subs .sm{display:block;color:var(--muted);font-size:11.5px}
+.subs .sm.late{color:var(--late);font-weight:600}
+.onde{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card.compact .onde,.card.compact details{display:none}
+.card.compact{padding:8px 11px;gap:4px}
 @media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
 </style>
 </head>
@@ -103,7 +118,7 @@ label textarea{min-height:76px;resize:vertical}
     <div>
       <div class="eyebrow">StartU + Insight · Projeto Pantynova</div>
       <h1>Quadro de pendências</h1>
-      <p class="sub">Tarefas, acessos, documentos e perguntas em aberto com a Pantynova. Base: pendências de 05/11 cruzadas com a reunião Financeiro, Tributário e Importação de 06/11.</p>
+      <p class="sub">Uma tarefa por frente de trabalho, com as subtarefas dentro. Abra o contador de subtarefas no card para ver e marcar o que já foi feito. Atualizado até a reunião de ecommerce de 19/11.</p>
     </div>
     <div class="score" id="score" aria-live="polite"></div>
   </header>
@@ -128,7 +143,7 @@ label textarea{min-height:76px;resize:vertical}
 
   <div id="stateBox" class="state">Carregando o quadro.</div>
   <div class="boardScroll" id="boardWrap" hidden><div class="board" id="board"></div></div>
-  <p class="legend">Arraste os cards entre colunas ou use o seletor de status em cada card. Clique no título para editar. As mudanças ficam salvas neste navegador; use Exportar JSON para atualizar a base do repositório. Fontes: Q05 = doc Perguntas, respostas e pendências (05/11); R06 = reunião e ata de 06/11.</p>
+  <p class="legend">Arraste os cards entre colunas ou use o seletor de status. Clique no título para editar a tarefa e as subtarefas. Cards concluídos aparecem compactos. As mudanças ficam salvas neste navegador; use Exportar JSON para atualizar a base do repositório. Fontes: Q05 = perguntas de 05/11; R06, R12 e R19 = reuniões de 06/11, 12/11 e 19/11; E17 = email da Dani de 17/11.</p>
 </div>
 
 <div class="scrim" id="scrim" hidden>
@@ -145,6 +160,7 @@ label textarea{min-height:76px;resize:vertical}
       <label>Prioridade<select id="f_prioridade"><option value="">Normal</option><option value="alta">Alta</option></select></label>
     </div>
     <label>Onde estamos<textarea id="f_onde"></textarea></label>
+    <label>Subtarefas: uma por linha, [x] feita ou [ ] aberta. Depois do texto, se quiser: | dono | AAAA-MM-DD | nota<textarea id="f_subs" style="min-height:150px;font-family:var(--mono);font-size:12.5px"></textarea></label>
     <label>Fonte / evidência<input id="f_fonte"></label>
     <datalist id="dlFrente"></datalist><datalist id="dlDono"></datalist>
     <div class="actions">
@@ -169,7 +185,7 @@ const STATUS=[
 const TIPOS=["Acesso","Documento","Análise","Pergunta","Reunião","Decisão"];
 const LADOS=["Pantynova","StartU","Insight","Key for Taxes","Grupo"];
 const SL=Object.fromEntries(STATUS.map(s=>[s.k,s]));
-let cards=[],canWrite=true,editing=null,tipoSel="";
+let cards=[],canWrite=true,editing=null,tipoSel="",openSet=new Set();
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
@@ -179,6 +195,11 @@ function toast(t){const el=$("toast");el.textContent=t;el.hidden=false;clearTime
 
 function fillSelect(sel,vals,keep){const cur=sel.value;const first=sel.options[0]&&sel.options[0].value===""?sel.options[0].outerHTML:"";sel.innerHTML=first+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if(keep)sel.value=cur}
 function uniq(f){return [...new Set(cards.map(c=>c[f]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt"))}
+const subsOf=c=>Array.isArray(c.subtasks)?c.subtasks:[];
+function donos(){return [...new Set(cards.flatMap(c=>[c.dono,...subsOf(c).map(x=>x.dono)]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt"))}
+const subLate=x=>x.prazo&&!x.ok&&new Date(x.prazo+"T00:00:00")<today();
+function subsToText(s){return (s||[]).map(x=>{const p=[x.dono||"",x.prazo||"",x.nota||""];while(p.length&&!p[p.length-1])p.pop();return "["+(x.ok?"x":" ")+"] "+x.t+(p.length?" | "+p.join(" | "):"")}).join("\n")}
+function textToSubs(t){return t.split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{let ok=false;const m=l.match(/^\[( |x|X)?\]\s*/);if(m){ok=/x/i.test(m[1]||"");l=l.slice(m[0].length)}const [tt,dono,prazo,nota]=l.split("|").map(v=>v.trim());return {t:tt||"",ok,dono:dono||"",prazo:/^\d{4}-\d{2}-\d{2}$/.test(prazo||"")?prazo:"",nota:nota||""}}).filter(x=>x.t)}
 
 function renderChips(){
   $("tipoChips").innerHTML=["",...TIPOS].map(t=>`<button type="button" class="chip" aria-pressed="${t===tipoSel}" data-t="${esc(t)}">${t||"Todos os tipos"}</button>`).join("");
@@ -187,16 +208,16 @@ $("tipoChips").addEventListener("click",e=>{const b=e.target.closest(".chip");if
 
 function filtered(){
   const q=$("q").value.trim().toLowerCase(),fr=$("fFrente").value,la=$("fLado").value,dn=$("fDono").value,ol=$("onlyLate").checked;
-  return cards.filter(c=>(!fr||c.frente===fr)&&(!la||c.lado===la)&&(!dn||c.dono===dn)&&(!tipoSel||c.tipo===tipoSel)&&(!ol||isLate(c))&&(!$("onlyPrio").checked||c.prioridade==="alta")&&
-    (!q||[c.title,c.dono,c.onde,c.frente,c.fonte].join(" ").toLowerCase().includes(q)));
+  return cards.filter(c=>(!fr||c.frente===fr)&&(!la||c.lado===la)&&(!dn||c.dono===dn||subsOf(c).some(x=>x.dono===dn))&&(!tipoSel||c.tipo===tipoSel)&&(!ol||isLate(c))&&(!$("onlyPrio").checked||c.prioridade==="alta")&&
+    (!q||[c.title,c.dono,c.onde,c.frente,c.fonte,...subsOf(c).map(x=>[x.t,x.dono,x.nota].join(" "))].join(" ").toLowerCase().includes(q)));
 }
 function render(){
-  fillSelect($("fFrente"),uniq("frente"),true);fillSelect($("fLado"),uniq("lado"),true);fillSelect($("fDono"),uniq("dono"),true);
+  fillSelect($("fFrente"),uniq("frente"),true);fillSelect($("fLado"),uniq("lado"),true);fillSelect($("fDono"),donos(),true);
   $("dlFrente").innerHTML=uniq("frente").map(v=>`<option value="${esc(v)}">`).join("");
   $("dlDono").innerHTML=uniq("dono").map(v=>`<option value="${esc(v)}">`).join("");
   const n={todo:0,doing:0,waiting:0,done:0};cards.forEach(c=>n[c.status]=(n[c.status]||0)+1);
-  const late=cards.filter(isLate).length,tot=cards.length||1;
-  $("score").innerHTML=STATUS.map(s=>`<div class="stat"><b style="color:${s.c}">${n[s.k]||0}</b><span>${s.l}</span></div>`).join("")+`<div class="stat late"><b>${late}</b><span>Atrasadas</span></div>`;
+  const late=cards.filter(isLate).length,tot=cards.length||1;let subTot=0,subOk=0;cards.forEach(c=>subsOf(c).forEach(x=>{subTot++;if(x.ok)subOk++}));
+  $("score").innerHTML=STATUS.map(s=>`<div class="stat"><b style="color:${s.c}">${n[s.k]||0}</b><span>${s.l}</span></div>`).join("")+`<div class="stat"><b>${subOk}/${subTot}</b><span>Subtarefas</span></div><div class="stat late"><b>${late}</b><span>Atrasadas</span></div>`;
   $("progress").innerHTML=STATUS.map(s=>`<i style="width:${(n[s.k]||0)/tot*100}%;background:${s.c}"></i>`).join("");
   const list=filtered();
   $("board").innerHTML=STATUS.map(s=>{
@@ -205,18 +226,19 @@ function render(){
       items.length?items.map(cardHTML).join(""):`<div class="empty">Nada aqui com estes filtros</div>`}</section>`}).join("");
 }
 function cardHTML(c){
-  const late=isLate(c);
-  return `<article class="card" draggable="${canWrite}" data-id="${esc(c.id)}" style="--stripe:${late?"var(--late)":SL[c.status].c}">
+  const late=isLate(c),s=subsOf(c),ok=s.filter(x=>x.ok).length,pct=s.length?ok/s.length*100:0;
+  return `<article class="card${c.status==="done"?" compact":""}" draggable="${canWrite}" data-id="${esc(c.id)}" style="--stripe:${late?"var(--late)":SL[c.status].c}">
     <h3><a href="#" class="open" data-id="${esc(c.id)}" style="color:inherit;text-decoration:none">${esc(c.title)}</a></h3>
     <div class="meta">${c.prioridade==="alta"?`<span class="tag prio">Prioridade alta</span>`:""}<span class="tag tipo">${esc(c.tipo)}</span><span class="tag">${esc(c.frente)}</span></div>
     ${c.onde?`<p class="onde">${esc(c.onde)}</p>`:""}
+    ${s.length?`<details class="sd"${openSet.has(c.id)?" open":""}><summary class="prog"><span>${ok}/${s.length} subtarefas</span><span class="pb"><i style="width:${pct}%"></i></span><span class="chev" aria-hidden="true">▾</span></summary><ul class="subs">${s.map((x,i)=>`<li class="${x.ok?"ok":""}"><input type="checkbox" class="sk" data-id="${esc(c.id)}" data-i="${i}" ${x.ok?"checked":""} ${canWrite?"":"disabled"} aria-label="Marcar subtarefa como feita"><span><span class="st">${esc(x.t)}</span>${(x.dono||x.prazo||x.nota)?`<span class="sm ${subLate(x)?"late":""}">${[x.dono,x.prazo?fmt(x.prazo):"",x.nota].filter(Boolean).map(esc).join(" · ")}</span>`:""}</span></li>`).join("")}</ul></details>`:""}
     <div class="foot"><span class="who">${esc(c.dono||"sem dono")}${c.lado?` <span class="tag">${esc(c.lado)}</span>`:""}</span>
       <span class="due ${late?"late":""}">${late?"atrasada · ":""}${fmt(c.prazo)}</span></div>
     ${canWrite?`<select class="mv" data-id="${esc(c.id)}" aria-label="Mudar status">${STATUS.map(s=>`<option value="${s.k}" ${s.k===c.status?"selected":""}>${s.l}</option>`).join("")}</select>`:""}
   </article>`;
 }
 
-const KEY="pantynova-kanban-v2";
+const KEY="pantynova-kanban-v3";
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(cards))}catch(e){}}
 async function save(id,data,isNew){
   data.atualizado=new Date().toISOString();
@@ -231,7 +253,11 @@ $("board").addEventListener("dragstart",e=>{const c=e.target.closest(".card");if
 $("board").addEventListener("dragend",e=>{document.querySelectorAll(".dragging,.over").forEach(x=>x.classList.remove("dragging","over"))});
 $("board").addEventListener("dragover",e=>{const col=e.target.closest(".col");if(!col||!dragId)return;e.preventDefault();document.querySelectorAll(".col.over").forEach(x=>x!==col&&x.classList.remove("over"));col.classList.add("over")});
 $("board").addEventListener("drop",e=>{const col=e.target.closest(".col");if(!col||!dragId)return;e.preventDefault();col.classList.remove("over");move(dragId,col.dataset.s);dragId=null});
-$("board").addEventListener("change",e=>{if(e.target.classList.contains("mv"))move(e.target.dataset.id,e.target.value)});
+$("board").addEventListener("change",e=>{
+  if(e.target.classList.contains("mv"))move(e.target.dataset.id,e.target.value);
+  if(e.target.classList.contains("sk")){const c=cards.find(x=>x.id===e.target.dataset.id);if(!c)return;const s=subsOf(c).map(x=>({...x}));const i=+e.target.dataset.i;if(!s[i])return;s[i].ok=e.target.checked;save(c.id,{subtasks:s},false)}
+});
+$("board").addEventListener("toggle",e=>{const d=e.target;if(!d.classList||!d.classList.contains("sd"))return;const id=d.closest(".card").dataset.id;d.open?openSet.add(id):openSet.delete(id)},true);
 $("board").addEventListener("click",e=>{const a=e.target.closest(".open");if(!a)return;e.preventDefault();openForm(cards.find(c=>c.id===a.dataset.id))});
 ["q","fFrente","fLado","fDono","onlyLate","onlyPrio"].forEach(id=>$(id).addEventListener("input",render));
 
@@ -242,6 +268,7 @@ function openForm(c){
   editing=c||null;$("formTitle").textContent=c?"Editar tarefa":"Nova tarefa";
   const v=c||{title:"",tipo:"Documento",status:"todo",frente:$("fFrente").value||"",prazo:"",dono:"",lado:"Pantynova",onde:"",fonte:""};
   ["title","tipo","status","frente","prazo","dono","lado","prioridade","onde","fonte"].forEach(k=>$("f_"+k).value=v[k]||"");
+  $("f_subs").value=subsToText(v.subtasks);
   $("delBtn").hidden=!c;$("delBtn").textContent="Excluir";$("delBtn").dataset.arm="";
   [...$("form").elements].forEach(el=>{if(el.id!=="cancelBtn")el.disabled=!canWrite});
   $("scrim").hidden=false;$("f_title").focus();
@@ -254,6 +281,7 @@ $("addBtn").onclick=()=>openForm(null);
 $("form").addEventListener("submit",async e=>{
   e.preventDefault();
   const d={};["title","tipo","status","frente","prazo","dono","lado","prioridade","onde","fonte"].forEach(k=>d[k]=$("f_"+k).value.trim());
+  d.subtasks=textToSubs($("f_subs").value);
   if(!d.title)return;
   if(editing){await save(editing.id,d,false)}else{await save("c"+Date.now().toString(36),d,true)}
   closeForm();
