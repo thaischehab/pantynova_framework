@@ -164,8 +164,8 @@ window.PANTYNOVA_CARDS = [
     "lado": "Key for Taxes",
     "prioridade": "",
     "prazo": "",
-    "fonte": "Q05 · R06",
-    "onde": "Base da revisão fiscal depois da virada para o modelo industrial.",
+    "fonte": "Q05 · R06 · R1911",
+    "onde": "19/11: Dani começou a baixar pelo Receita BX, com certificado digital, a EFD Contribuições e a EFD ICMS/IPI de 01/01/2026 até hoje. A Receita suspendeu o serviço até 17h06. Pauta tributária fica para a próxima semana.",
     "subtasks": [
       {
         "t": "Acesso ao ERP da matriz (0001) e das lojas SP e BH",
@@ -185,7 +185,14 @@ window.PANTYNOVA_CARDS = [
         "t": "Apurações das filiais (ICMS, PIS/COFINS, IR)",
         "dono": "Financeiro",
         "prazo": "",
-        "nota": "",
+        "nota": "Dani já pediu ao Carlos (entrada, saída e apuração do ICMS)",
+        "ok": false
+      },
+      {
+        "t": "EFDs (Contribuições e ICMS/IPI) desde 01/01/2026",
+        "dono": "Dani",
+        "prazo": "",
+        "nota": "download iniciado em 19/11; zipar e compartilhar link com o Marcelo",
         "ok": false
       },
       {
@@ -201,9 +208,16 @@ window.PANTYNOVA_CARDS = [
         "prazo": "",
         "nota": "",
         "ok": false
+      },
+      {
+        "t": "Marcar conversa de 30 min com a Dani",
+        "dono": "Marcelo",
+        "prazo": "2026-11-23",
+        "nota": "entre 19/11 e 23/11",
+        "ok": false
       }
     ],
-    "atualizado": "2026-11-19T19:30:00Z"
+    "atualizado": "2026-11-19T21:00:00Z"
   },
   {
     "id": "t05",
@@ -215,8 +229,8 @@ window.PANTYNOVA_CARDS = [
     "lado": "Grupo",
     "prioridade": "",
     "prazo": "",
-    "fonte": "Q05 · R06 · E17",
-    "onde": "Marcelo monta o DRE a partir do fluxo de caixa da Dani (13/11). Contexto: 9 parcelamentos (2 federais, 7 de DIFAL), empréstimos em dia, CMV consolidado de 20% a 26%.",
+    "fonte": "Q05 · R06 · E17 · R1911",
+    "onde": "19/11: Marcelo apresentou o DRE jan a jun pelos XMLs do Tiny. Margem de contribuição ~40% no 1º tri; margem EBITDA 11,1% no 1º tri, 7,8% no 2º e 9,4% no semestre. CMV de 30% ainda a refinar (interno: 24%). Fluxo de caixa não foi apresentado.",
     "subtasks": [
       {
         "t": "Planilhas financeiras e fluxo de caixa projetado",
@@ -229,7 +243,63 @@ window.PANTYNOVA_CARDS = [
         "t": "Reprocessar o DRE de janeiro a outubro com os XMLs",
         "dono": "Marcelo",
         "prazo": "",
-        "nota": "em andamento",
+        "nota": "versão jan a jun apresentada em 19/11; revisão por filial em curso",
+        "ok": false
+      },
+      {
+        "t": "Refinar o CMV (30% no DRE contra 24% interno)",
+        "dono": "Marcelo",
+        "prazo": "",
+        "nota": "refinar com livro de entrada e EFDs",
+        "ok": false
+      },
+      {
+        "t": "Confrontar o DRE com as apurações do Carlos",
+        "dono": "Dani",
+        "prazo": "",
+        "nota": "",
+        "ok": false
+      },
+      {
+        "t": "Enviar à Dani a abertura dos impostos sobre vendas por nota",
+        "dono": "Marcelo",
+        "prazo": "",
+        "nota": "",
+        "ok": false
+      },
+      {
+        "t": "DRE do atacado apartado (DANFE = atacado, NFC-e = loja)",
+        "dono": "Marcelo",
+        "prazo": "",
+        "nota": "Dani separa a Lelê de pessoal",
+        "ok": false
+      },
+      {
+        "t": "Conferir valores mensais dos Correios (queda em março)",
+        "dono": "Lola",
+        "prazo": "",
+        "nota": "ciclo mensal finalizado em 23/02",
+        "ok": false
+      },
+      {
+        "t": "Conferir lançamentos de segurança e TI",
+        "dono": "Dani",
+        "prazo": "",
+        "nota": "Verisure desde jun, cobrança desde ago; Porto Seguro em BH",
+        "ok": true
+      },
+      {
+        "t": "Repasse do DRE revisado",
+        "dono": "Marcelo + Dani",
+        "prazo": "",
+        "nota": "depois Edu, depois 30 min com Lola e Iza",
+        "ok": false
+      },
+      {
+        "t": "Escolher as contas de despesa a atacar",
+        "dono": "Edu + Marcelo",
+        "prazo": "",
+        "nota": "compras, importação, fornecedores, CMV e cartão",
         "ok": false
       },
       {
@@ -247,7 +317,7 @@ window.PANTYNOVA_CARDS = [
         "ok": false
       }
     ],
-    "atualizado": "2026-11-19T19:30:00Z"
+    "atualizado": "2026-11-19T21:00:00Z"
   },
   {
     "id": "t06",
@@ -317,14 +387,28 @@ window.PANTYNOVA_CARDS = [
     "lado": "Grupo",
     "prioridade": "",
     "prazo": "",
-    "fonte": "Q05 · R06 · R19",
-    "onde": "SP fez R$ 12 mil em outubro contra R$ 17 mil projetados, com aluguel de cerca de R$ 7 mil. BH também abaixo do piso. O regime do ecommerce impede vender do site para a loja.",
+    "fonte": "Q05 · R06 · R19 · R1911",
+    "onde": "19/11: o DRE da loja SP incluía o atacado (jan R$ 90 mil contra R$ 15 a 16 mil/mês da loja) e as despesas do atacado. BH sem notas em jan e fev; média da Dani é R$ 18 mil/mês pelo banco. Sem rateio. Decisão parte do número e depois avalia benefício estratégico.",
     "subtasks": [
       {
         "t": "DRE de cada loja sem rateio",
-        "dono": "Grupo",
+        "dono": "Marcelo",
+        "prazo": "",
+        "nota": "separar atacado; matriz = loja física",
+        "ok": false
+      },
+      {
+        "t": "Explicar vendas da loja BH sem nota (jan a mar)",
+        "dono": "Dani + Lola",
         "prazo": "",
         "nota": "",
+        "ok": false
+      },
+      {
+        "t": "Avaliar faturar o atacado só por MG",
+        "dono": "Iza",
+        "prazo": "",
+        "nota": "regime especial tem benefício no atacado",
         "ok": false
       },
       {
@@ -342,7 +426,7 @@ window.PANTYNOVA_CARDS = [
         "ok": false
       }
     ],
-    "atualizado": "2026-11-19T19:30:00Z"
+    "atualizado": "2026-11-19T21:00:00Z"
   },
   {
     "id": "t08",
@@ -442,12 +526,26 @@ window.PANTYNOVA_CARDS = [
     "lado": "StartU",
     "prioridade": "",
     "prazo": "",
-    "fonte": "Q05 · R06 · R12",
-    "onde": "Plano Advanced, com CRM nativo no lugar de Klaviyo e RD Station. Já cortaram até R$ 40 mil em apps. Ideia: trocar apps por desenvolvimento com IA e reinvestir no Plus.",
+    "fonte": "Q05 · R06 · R12 · R1911",
+    "onde": "Plano Advanced, com CRM nativo no lugar de Klaviyo e RD Station. Já cortaram até R$ 40 mil em apps. 19/11: no DRE o Shopify está numa linha só; vai ser aberto em comissão (variável), apps (fixo) e Collabs (cobrado em dólar).",
     "subtasks": [
       {
         "t": "Mapear o custo de cada app e as taxas por venda",
         "dono": "StartU",
+        "prazo": "",
+        "nota": "",
+        "ok": false
+      },
+      {
+        "t": "Separar Shopify fixo e variável no DRE",
+        "dono": "Marcelo",
+        "prazo": "",
+        "nota": "",
+        "ok": false
+      },
+      {
+        "t": "Classificar apps do Shopify (marketing ou loja)",
+        "dono": "Marcelo + Yuri + Pedro + Derek",
         "prazo": "",
         "nota": "",
         "ok": false
@@ -460,7 +558,7 @@ window.PANTYNOVA_CARDS = [
         "ok": false
       }
     ],
-    "atualizado": "2026-11-19T19:30:00Z"
+    "atualizado": "2026-11-19T21:00:00Z"
   },
   {
     "id": "t11",
@@ -755,7 +853,7 @@ window.PANTYNOVA_CARDS = [
     "lado": "StartU",
     "prioridade": "",
     "prazo": "",
-    "fonte": "Q05 · R06 · R12 · R19",
+    "fonte": "Q05 · R06 · R12 · R19 · R1911",
     "onde": "Rituais: quinzenal financeiro e fiscal às sextas, 14h30; ecommerce com o Derek sob demanda.",
     "subtasks": [
       {
@@ -792,8 +890,15 @@ window.PANTYNOVA_CARDS = [
         "prazo": "",
         "nota": "",
         "ok": true
+      },
+      {
+        "t": "Reunião financeira, tributária e de importação de 19/11 e ata",
+        "dono": "StartU",
+        "prazo": "",
+        "nota": "antecipada de 20/11 por causa do feriado",
+        "ok": true
       }
     ],
-    "atualizado": "2026-11-19T19:30:00Z"
+    "atualizado": "2026-11-23T13:00:00Z"
   }
 ];
